@@ -9,6 +9,6 @@ const router = Router();
 router.get("/customers", getCustomers);
 router.get("/customers/:id", getIdCustomers);
 router.post("/customers", validateSchema(costumersSchemas), validCpfCustomers, postCostumers);
-router.put("/customers/:id",validateSchema(costumersSchemas), validCpfCustomers, putCustomers);
+router.put("/customers/:id",validateSchema(costumersSchemas), putCustomers);
 
 export default router;
