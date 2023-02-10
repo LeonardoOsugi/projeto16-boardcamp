@@ -7,9 +7,11 @@ export async function validPutCpfCustomers(req, res, next){
     const cpfExist = await db.query(`SELECT * FROM customers WHERE cpf = $1`, [cpf]);
 
 
-        if(cpfExist.rows[0].id === id && cpfExist.rowCount > 0 ){
-            res.sendStatus(409);
-            return;
+        if(cpfExist.rowCount > 0 ){
+            if(cpfExist.rows[0].id === id){
+                res.sendStatus(409);
+                return;
+            }
         };
     next();
 };
