@@ -36,4 +36,19 @@ export async function getIdCustomers(req, res){
     }catch(err){
         res.status(500).send(err);
     }
+};
+
+export async function putCustomers(req, res){
+    const {name, phone, cpf, birthday} = req.body;
+    const {id} = req.params;
+    try{
+        await db.query(`UPDATE customers SET name = $1 WHERE id = $2`,[name, id]);
+        await db.query(`UPDATE customers SET  phone = $1 WHERE id = $2`, [phone, id]);
+        await db.query(`UPDATE customers SET cpf = $1 WHERE id = $2`, [cpf, id]);
+        await db.query(`UPDATE customers SET birthday = $1 WHERE id = $2`, [birthday, id]);
+
+        res.sendStatus(200);
+    }catch(err){
+        res.status(500).send(err.message);
+    }
 }
