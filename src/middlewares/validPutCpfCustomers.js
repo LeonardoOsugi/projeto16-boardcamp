@@ -8,7 +8,7 @@ export async function validPutCpfCustomers(req, res, next){
 
 
         if(cpfExist.rowCount > 0 ){
-            if(cpfExist.rows[0].id !== id){
+            if(cpfExist.rows[0].id !== Number(id)){
                 res.sendStatus(409);
                 return;
             }
