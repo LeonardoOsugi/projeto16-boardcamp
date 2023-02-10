@@ -32,7 +32,7 @@ export async function getIdCustomers(req, res){
             return res.sendStatus(404);
         }
 
-        res.send(listaClienteId[0].rows);
+        res.send(listaClienteId.rows[0]);
     }catch(err){
         res.status(500).send(err);
     }
