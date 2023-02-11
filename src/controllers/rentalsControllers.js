@@ -10,7 +10,7 @@ export async function postRentals(req, res){
         const stockExist = await db.query(`SELECT ("stockTotal") FROM games WHERE id = $1`, [gameId]);
 
         if(stockExist.rows[0].stockTotal === 0){
-            res.status(400).send({message: "Não temos mais esse produto em stock"})
+            return res.status(400).send({message: "Não temos mais esse produto em stock"});
         }
 
         await db.query(`INSERT INTO rentals ("customerId", "gameId", "rentDate", "daysRented", "returnDate", "originalPrice", "delayFee") VALUES ($1, $2, $3, $4, $5, $6, $7);`,[customerId, gameId, dayjs().locale("pt").format("YYYY-MM-DD"), daysRented, null, daysRented*precoGame.rows[0].pricePerDay, null]);
