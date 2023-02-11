@@ -9,6 +9,7 @@ export async function validBodyRentals(req, res, next){
 
     if(clienteExist.rowCount === 0 || jogoExist.rowCount === 0 || daysRented <= 0){
         res.sendStatus(400);
+        return;
     };
 
     next();
