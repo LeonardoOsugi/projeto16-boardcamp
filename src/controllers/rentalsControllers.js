@@ -23,7 +23,7 @@ export async function postRentals(req, res){
         SELECT COUNT(*)
         FROM rentals
         WHERE "gameId" = $8 AND "returnDate" ISNULL
-    );`,[customerId, gameId, new Date(), daysRented, daysRented,gameId, customerId, gameId, gameId, gameId]);
+    );`,[customerId, gameId, dayjs().locale("pt").format("HH:mm:ss"), daysRented, daysRented,gameId, customerId, gameId, gameId, gameId]);
 
         res.sendStatus(201);
 
