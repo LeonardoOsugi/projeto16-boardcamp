@@ -39,7 +39,7 @@ export async function postFinalizarRentals(req, res){
     try{
         let delayFee = 0;
         
-        const listaRentals = await db.query(`SELECT * FROM rentals WHERE id $1`, [id]);
+        const listaRentals = await db.query(`SELECT * FROM rentals WHERE id = $1`, [id]);
         const tempoFinal = new Date().getTime() - new Date(listaRentals.rows[0].rentDate).getTime();
         const diasConcluidos = Math.floor(tempoFinal/ (24*3600*1000));
         const diasAlugados = listaRentals.rows[0].daysRented;
@@ -48,8 +48,6 @@ export async function postFinalizarRentals(req, res){
             const payDay = diasConcluidos - diasAlugados;
             delayFee = payDay * listaRentals.rows[0].originalPrice;
         }
-
-
         await db.query(`UPDATE rentals SET "returnDate" = $1, "delayFee" = $2 WHERE id = $3`, [dayjs().locale("pt").format("YYYY-MM-DD"), delayFee, id]);
 
         res.sendStatus(200);
