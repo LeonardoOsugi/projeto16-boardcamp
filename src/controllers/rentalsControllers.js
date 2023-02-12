@@ -8,7 +8,7 @@ export async function postRentals(req, res){
         const stockGame = await db.query(`SELECT "stockTotal" FROM games WHERE id = $1`, [gameId]);
         const stocks = await db.query(`SELECT COUNT(*) FROM rentals WHERE "gameId" = $1 AND "returnDate" IS NULL`, [gameId]);
 
-        if(stockGame.rows[0].stockTotal < stocks.rows[0].count){
+        if(stockGame.rows[0].stockTotal <= stocks.rows[0].count){
             return res.status(400).send({message: "é esse mesmo ;)"});
         }
 
