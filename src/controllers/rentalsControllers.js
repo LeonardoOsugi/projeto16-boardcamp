@@ -13,7 +13,7 @@ export async function postRentals(req, res){
         }
 
         await db.query(`INSERT INTO rentals ("customerId", "gameId", "rentDate", "daysRented", "originalPrice") SELECT $1, $2, $3, $4,  $5 * (SELECT "pricePerDay" FROM games WHERE id = $6) WHERE EXISTS (
-        SELECT * FROM customers WHERE id = $7) AND EXISTS ( SELECT * FROM games WHERE id = $8 ) AND ( SELECT "stockTotal" FROM games WHERE id = $9 ) > ( SELECT COUNT(*) FROM rentals WHERE "gameId" = $10 AND "returnDate" IS NULL )`,[customerId, gameId, new Date(), daysRented, daysRented,gameId, customerId, gameId, gameId, gameId]);
+        SELECT * FROM customers WHERE id = $7) AND EXISTS ( SELECT * FROM games WHERE id = $8 ) AND ( SELECT "stockTotal" FROM games WHERE id = $9 ) > ( SELECT COUNT(*) FROM rentals WHERE "gameId" = $10 AND "returnDate" IS NULL )`,[customerId, gameId, dayjs().locale("pt").format("YYYY-MM-DD"), daysRented, daysRented,gameId, customerId, gameId, gameId, gameId]);
 
         res.sendStatus(201);
 
@@ -37,18 +37,24 @@ export async function getRentals(req, res){
 export async function postFinalizarRentals(req, res){
     const {id} = req.params;
     try{
-        let delayFee = 0;
+        // let delayFee = 0;
         
-        const listaRentals = await db.query(`SELECT * FROM rentals WHERE id = $1`, [id]);
-        const tempoFinal = new Date().getTime() - new Date(listaRentals.rows[0].rentDate).getTime();
-        const diasConcluidos = Math.floor(tempoFinal / (24*3600*1000));
-        const diasAlugados = listaRentals.rows[0].daysRented;
+        // const listaRentals = await db.query(`SELECT * FROM rentals WHERE id = $1`, [id]);
+        // const tempoFinal = new Date().getTime() - new Date(listaRentals.rows[0].rentDate).getTime();
+        // const diasConcluidos = Math.floor(tempoFinal / (24 * 3600 * 1000));
+        // const diasAlugados = listaRentals.rows[0].daysRented;
 
-        if(diasConcluidos > diasAlugados){
-            const payDay = diasConcluidos - diasAlugados;
-            delayFee = payDay * listaRentals.rows[0].originalPrice;
-        }
-        await db.query(`UPDATE rentals SET "returnDate" = $1, "delayFee" = $2 WHERE id = $3`, [dayjs().locale("pt").format("YYYY-MM-DD"), delayFee, id]);
+        // if(diasConcluidos > diasAlugados){
+        //     const payDay = diasConcluidos - diasAlugados;
+        //     delayFee = payDay * listaRentals.rows[0].originalPrice;
+        // }
+        await db.query(`UPDATE rentals SET "returnDate" = $1, "delayFee" = (
+            SELECT "pricePerDay"
+            FROM games
+            WHERE id = rentals."gameId"
+          ) * GREATEST(0, DATE_PART('day', $2::timestamp - "rentDate"::timestamp) - "daysRented")
+          WHERE id = $3
+          AND "returnDate" IS NULL`, [dayjs().locale("pt").format("YYYY-MM-DD"), dayjs().locale("pt").format("YYYY-MM-DD"), id]);
 
         res.sendStatus(200);
     }catch(err){
