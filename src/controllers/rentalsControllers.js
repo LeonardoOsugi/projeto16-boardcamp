@@ -37,17 +37,6 @@ export async function getRentals(req, res){
 export async function postFinalizarRentals(req, res){
     const {id} = req.params;
     try{
-        // let delayFee = 0;
-        
-        // const listaRentals = await db.query(`SELECT * FROM rentals WHERE id = $1`, [id]);
-        // const tempoFinal = new Date().getTime() - new Date(listaRentals.rows[0].rentDate).getTime();
-        // const diasConcluidos = Math.floor(tempoFinal / (24 * 3600 * 1000));
-        // const diasAlugados = listaRentals.rows[0].daysRented;
-
-        // if(diasConcluidos > diasAlugados){
-        //     const payDay = diasConcluidos - diasAlugados;
-        //     delayFee = payDay * listaRentals.rows[0].originalPrice;
-        // }
         await db.query(`UPDATE rentals SET "returnDate" = $1, "delayFee" = (
             SELECT "pricePerDay"
             FROM games
@@ -59,5 +48,16 @@ export async function postFinalizarRentals(req, res){
         res.sendStatus(200);
     }catch(err){
         res.status(500).send(err.message);
+    };
+};
+
+export async function deleteRentals(req, res){
+    const {id} = req.params;
+    try{
+        await db.query(`DELETE FROM rentals WHERE id = $1`,[id]);
+        res.sendStatus(200);
+    }catch(err){
+        res.status(500).send(err.message);
     }
 }
+
