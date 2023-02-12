@@ -8,12 +8,13 @@ import { postFinalizarRentals } from "../controllers/rentalsControllers.js";
 import { validIdPostFinalizarRentals } from "../middlewares/validIdPostFinalizarRentals.js";
 import { validAlreadyFinishedRentals } from "../middlewares/validAlreadyFinishedRentals.js";
 import { deleteRentals } from "../controllers/rentalsControllers.js";
+import { validReturnDate } from "../middlewares/validReturnDate.js";
 
 const router = Router();
 
 router.get("/rentals", getRentals);
 router.post("/rentals", validateSchema(rentalSchemas), validBodyRentals ,postRentals);
 router.post("/rentals/:id/return", validIdPostFinalizarRentals , validAlreadyFinishedRentals, postFinalizarRentals);
-router.delete("/rentals/:id", validIdPostFinalizarRentals , validAlreadyFinishedRentals, deleteRentals);
+router.delete("/rentals/:id", validIdPostFinalizarRentals, validReturnDate , deleteRentals);
 
 export default router;
