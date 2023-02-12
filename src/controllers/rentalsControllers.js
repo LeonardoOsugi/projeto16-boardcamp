@@ -9,7 +9,7 @@ export async function postRentals(req, res){
         const stocks = await db.query(`SELECT COUNT(*)FROM rentals WHERE "gameId" = $1 AND "returnDate" ISNULL`, [gameId]);
 
         if(stockGame.rows[0].stockTotal < stocks.rows[0].count){
-            return res.status(400);
+            return res.sendStatus(400);
         }
 
         await db.query(`INSERT INTO rentals ("customerId", "gameId", "rentDate", "daysRented", "originalPrice") SELECT $1, $2, $3, $4,  $5 * (SELECT "pricePerDay" FROM games WHERE id = $6) WHERE EXISTS (
