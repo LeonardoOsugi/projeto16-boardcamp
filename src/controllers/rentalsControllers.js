@@ -24,13 +24,35 @@ export async function postRentals(req, res){
 
 export async function getRentals(req, res){
     try{
-        const listRentals = await db.query(`SELECT rentals.*, JSON_BUILD_OBJECT('id', customers.id,'name', customers.name) AS customer,
-        JSON_BUILD_OBJECT('id', games.id, 'name', games.name) AS game
-         FROM rentals JOIN customers ON rentals."customerId" = customers.id JOIN games ON rentals."gameId" = games.id `);
+        const listRentals = await db.query(`SELECT rentals.*,JSON_BUILD_OBJECT('id', customers.id,'name', customers.name) AS customer, JSON_BUILD_OBJECT('id', games.id, 'name', games.name) AS game FROM rentals JOIN customers ON rentals."customerId" = customers.id JOIN games ON rentals."gameId" = games.id `);
 
         console.log(listRentals.rows)
 
         res.send(listRentals.rows)
+    }catch(err){
+        res.status(500).send(err.message);
+    }
+};
+
+export async function postFinalizarRentals(req, res){
+    const {id} = req.params;
+    try{
+        let delayFee = 0;
+        
+        const listaRentals = await db.query(`SELECT * FROM rentals WHERE id $1`, [id]);
+        const tempoFinal = new Date().getTime() - new Date(listaRentals.rows[0].rentDate).getTime();
+        const diasConcluidos = Math.floor(tempoFinal/ (24*3600*1000));
+        const diasAlugados = listaRentals.rows[0].daysRented;
+
+        if(diasConcluidos > diasAlugados){
+            const payDay = diasConcluidos - diasAlugados;
+            delayFee = payDay * listaRentals.rows[0].originalPrice;
+        }
+
+
+        await db.query(`UPDATE rentals SET "returnDate" = $1, "delayFee" = $2 WHERE id = $3`, [dayjs().locale("pt").format("YYYY-MM-DD"), delayFee, id]);
+
+        res.sendStatus(200);
     }catch(err){
         res.status(500).send(err.message);
     }
