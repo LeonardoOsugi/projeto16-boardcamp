@@ -3,10 +3,11 @@ import { postRentals } from "../controllers/rentalsControllers.js";
 import { validateSchema } from "../middlewares/validSchema.js";
 import { rentalSchemas } from "../models/schemas.js";
 import { validBodyRentals } from "../middlewares/validBodyRentals.js";
+import { getRentals } from "../controllers/rentalsControllers.js";
 
 const router = Router();
 
-router.get("/rentals");
+router.get("/rentals", getRentals);
 router.post("/rentals", validateSchema(rentalSchemas), validBodyRentals ,postRentals);
 router.post("/rentals/:id/return");
 router.delete("/rentals/:id");

@@ -20,4 +20,18 @@ export async function postRentals(req, res){
     }catch(err){
         res.status(500).send(err.message);
     }
+};
+
+export async function getRentals(req, res){
+    try{
+        const listRentals = await db.query(`SELECT rentals.*, JSON_BUILD_OBJECT('id', customers.id,'name', customers.name) AS customer,
+        JSON_BUILD_OBJECT('id', games.id, 'name', games.name) AS game
+         FROM rentals JOIN customers ON rentals."customerId" = customers.id JOIN games ON rentals."gameId" = games.id `);
+
+        console.log(listRentals.rows)
+
+        res.send(listRentals.rows)
+    }catch(err){
+        res.status(500).send(err.message);
+    }
 }
